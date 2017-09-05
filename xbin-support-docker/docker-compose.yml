@@ -1,0 +1,160 @@
+version: "2"
+
+services: 
+
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+
+    tracker:
+        image: season/fastdfs
+        network_mode: "host"
+        volumes:
+            - ./data/tracker_data:/fastdfs/tracker/data
+        command: tracker
+
+    storage:
+        image: season/fastdfs
+        network_mode: "host"
+        volumes:
+            - ./data/storage_data:/fastdfs/storage/data
+            - ./data/storage_path:/fastdfs/store_path
+        environment:
+            - TRACKER_SERVER=192.168.2.167:22122
+        command: storage
+        depends_on:
+            - tracker
+
+    zookeeper:
+        image: zookeeper
+        ports:
+            - "2181:2181"
+            - "2888:2888"
+            - "3888:3888"
+
+    solr:
+        image: solr
+        ports:
+            - "8983:8983"
+        links:
+            - zookeeper:zookeeper
+        volumes:
+            - ./files/solr.xml:/opt/solr/server/solr/solr.xml
+        entrypoint:
+            - bin/solr
+            - start
+            - -c
+            - -z
+            - zookeeper:2181
+            - -f
+
+    dubboadmin:
+        image: webuilder/dubboadmin
+        ports:
+            - "9090:8080"
+        links:
+            - zookeeper:zookeeper-server
+    nginx:
+        image: nginx
+        ports:
+            - "4000:80"
+        volumes:
+            - ./files/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./data/storage_path:/web:ro
+
+    shoppingdb:
+        image: mariadb:latest
+        container_name: shoppingdb
+        environment:
+            MYSQL_ROOT_PASSWORD: passwd
+        ports:
+          - "3306:3306"
+        volumes:
+          - /var/data/mysql:/var/lib/mysql
+          - ../SQL/:/docker-entrypoint-initdb.d
+
+    serviceredis:
+        image: xbin-store-service-redis
+        ports:
+            - "20881:20881"
+
+    servicesso:
+        image: xbin-store-service-sso
+        ports:
+            - "20885:20885"
+
+    servicenotify:
+        image: xbin-store-service-notify
+        ports:
+            - "20886:20886"
+
+    serviceitem:
+        image: xbin-store-service-item
+        ports:
+            - "20884:20884"
+
+    serviceorder:
+        image: xbin-store-web-order
+        ports:
+            - "20888:20888"
+
+    servicecart:
+        image: xbin-store-web-cart
+        ports:
+            - "20887:20887"
+
+    servicesearch:
+        image: xbin-store-service-search
+        ports:
+            - "20882:20882"
+
+    serviceportal:
+        image: xbin-store-service-portal
+        ports:
+            - "20883:20883"
+
+    serviceadmin:
+        image: xbin-store-service-admin
+        ports:
+            - "20880:20880"
+
+    websso:
+        image: xbin-store-web-sso
+        ports:
+          - "8104:8104"
+
+    websearch:
+        image: xbin-store-web-search
+        ports:
+          - "8102:8102"
+
+    webcart:
+        image: xbin-store-web-cart
+        ports:
+          - "8107:8107"
+
+    webitem:
+        image: xbin-store-web-item
+        ports:
+          - "8103:8103"
+
+    weborder:
+        image: xbin-store-web-order
+        ports:
+          - "8108:8108"
+
+    webcart:
+        image: xbin-store-web-cart
+        ports:
+          - "8107:8107"
+
+    webadmin:
+        image: xbin-store-web-admin
+        ports:
+          - "8100:8100"
+
+    webportal:
+        image: xbin-store-web-portal
+        ports:
+          - "8101:8101"
