@@ -1,0 +1,6 @@
+[submodule "dependencies/dubbox"]
+	path = dependencies/dubbox
+	url = https://github.com/remoting/dubbox
+[submodule "dependencies/apollo"]
+	path = dependencies/apollo
+	url = https://github.com/ctripcorp/apollo

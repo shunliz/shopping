@@ -1,13 +1,17 @@
+echo "===========downloading the submodules================"
+git submodule update --init --recursive
+
 cd dependencies
 echo "=========building dependencies=================="
 for i in `ls`
 do
-cd $i 
+cd $i
+echo "============building $i========================="
 mvn clean install -DskipTests=true
 cd ..
 done
 
-echo "=========building codes=================="
+echo "=========building codes========================="
 mvn clean package -DskipTests=true
 
 cd xbin-support-docker
