@@ -1,12 +1,13 @@
 cd dependencies
-
+echo "=========building dependencies=================="
 for i in `ls`
 do
-cd i 
+cd $i 
 mvn clean install -DskipTests=true
 cd ..
 done
 
+echo "=========building codes=================="
 mvn clean package -DskipTests=true
 
 cd xbin-support-docker
@@ -23,6 +24,7 @@ then
 pip install docker-compose
 fi
 
+echo "=========starting the dockers=================="
 docker-compose up -d
 
 # visit http://localhost:8104/login, username:zhangsan password:123456
